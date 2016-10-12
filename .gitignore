@@ -57,4 +57,4 @@ Temporary Items
 !.vscode/tasks.json
 !.vscode/launch.json
 node_modules/
-!node_modules
+bower_components/
