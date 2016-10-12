@@ -1,5 +1,5 @@
 // Creates the MainCtrl Module and Controller.
-angular.module('mainModule', []).controller('MainCtrl', ['$scope', '$window', '$http', '$log', 'Urls', function($scope, $window, $http, $log, Urls) {
+app.controller('MainCtrl', ['$scope', '$window', '$http', '$log', 'Urls', 'Constants', function($scope, $window, $http, $log, Urls, Constants) {
     $log.log('hello biach');
 
     var pingUrl = Urls.BASE_URL + Urls.PING;
