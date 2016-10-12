@@ -28,6 +28,10 @@ gulp.task('injectJS', function(){
          .pipe(gulp.dest('./public'));
  });
 
- gulp.task('startServer', function() {
-    exec('node server', function (err, stdout, stderr) {});
+gulp.task('startServer', function(cb) {
+    exec('node server', function (err, stdout, stderr) {
+        console.log(stdout);
+        console.log(stderr);
+        cb(err);
+    });
 });
