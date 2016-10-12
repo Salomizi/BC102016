@@ -1,0 +1,11 @@
+{
+  "name": "battleCode",
+  "dependencies": {
+    "jquery": "latest",
+    "angular": "latest",
+    "angular-bootstrap": "latest",
+    "angular-ui-router": "latest",
+    "angular-ui-select": "latest",
+    "angular-sanitize": "latest"
+  }
+}

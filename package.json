@@ -1,0 +1,13 @@
+{
+  "name": "battleCode",
+  "main": "server.js",
+  "dependencies": {
+    "bower": "^1.7.9",
+    "child-process": "^1.0.2",
+    "express": "^4.14.0",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-inject": "^4.1.0",
+    "wiredep": "^4.0.0"
+  }
+}
