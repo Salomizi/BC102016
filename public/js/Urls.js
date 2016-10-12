@@ -1,8 +1,11 @@
 angular.module('config', []).factory('Urls', [function() {
+
+    ///////INFO AT http://codeandplay.date/public/api.html /////////////////////////
+
     return {
         BASE_URL: 'http://www.codeandplay.date',
         PING: '/test-ws/ping',
-        USER: '/test-ws/player/getIdEquipe/@teamName/@password',
+        USER: '/test-ws/player/getIdEquipe/iMOBILE',
 
         //vs player
         INIT_PLAYER_GAME: '/test-ws/versus/next/@teamId',
