@@ -23,9 +23,18 @@
 
 </head>
 <body ng-controller="MainCtrl">
-    <div class="container">
-        <button ng-click="getTeamId()">TEAM ID</button>
-        <button ng-click="createGame()">CREATE BOT GAME</button>       
+    <div>
+        <button ng-click="getTeamId()" ng-disabled="teamId">TEAM ID</button>
+    </div>
+    <div>
+        <div>
+            BOT LEVEL:
+            <input ng-model="botLevel"/>
+        </div>
+        <button ng-click="createGame()" ng-disabled="!teamId || gameId">CREATE BOT GAME</button>
+    </div>
+    <div>
+        <button ng-click="launchGame()" ng-disabled="!teamId || !gameId">LAUNCH BOT GAME</button>          
     </div>
 </body>
 </html>
