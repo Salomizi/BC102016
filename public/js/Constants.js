@@ -5,15 +5,22 @@ app.factory('Constants', [function() {
     return {
         UNKNOWN: 'NA',
 
-        STATUS_YES: 'OUI',
-        STATUS_NO: 'NON',
-        STATUS_WIN: 'GAGNE',
-        STATUS_LOST: 'PERDU',
-        STATUS_CANCEL: 'ANNULE',
+        STATUS_YES: 'CANPLAY',
+        STATUS_NO: 'CANTPLAY',
+        STATUS_WIN: 'VICTORY',
+        STATUS_LOST: 'DEFEAT',
+        STATUS_CANCEL: 'CANCELLED',
 
         MOVE_OK: 'OK',
-        MOVE_KO: 'KO',
-        MOVE_WIN: 'GAGNE',
-        MOVE_NOT_YOUR_TURN: 'PTT'
+        MOVE_KO: 'FORBIDDEN',
+        MOVE_DEFEAT: 'GAMEOVER',
+        MOVE_NOT_YOUR_TURN: 'NOTYET',
+
+        //MOVES
+        MOVE_SHOOT: 'SHOOT',
+        MOVE_RELOAD: 'RELOAD',
+        MOVE_COVER: 'COVER',
+        MOVE_AIM: 'AIM',
+        MOVE_BOMB: 'BOMB'
     }
 }]);
