@@ -5,9 +5,9 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$log', '$timeou
     var pingUrl = Urls.BASE_URL + Urls.PING;
     var teamIdUrl = Urls.BASE_URL + Urls.USER;
     var createBotGameUrl = Urls.BASE_URL + Urls.INIT_BOT_GAME;
-    var gameStatusUrl = Urls.GAME_STATUS;
-    var gameBoardUrl = Urls.GAME_BOARD;
-    var makeMoveUrl = Urls.GAME_MAKE_MOVE;
+    var gameStatusUrl = Urls.BASE_URL + Urls.GAME_STATUS;
+    var gameBoardUrl = Urls.BASE_URL + Urls.GAME_BOARD;
+    var makeMoveUrl = Urls.BASE_URL + Urls.GAME_MAKE_MOVE;
 
     //GAME variables
     $scope.teamId = null;
@@ -63,8 +63,28 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$log', '$timeou
      * @return move to make
      */
     function computeNextMove (board) {
+        board = JSON.parse(board);
+        var player1 = board.player1;
+        var player2 = board.player2;
         //TODO intelligence de batard
-        return Constants.MOVE_SHOOT;
+        /*if (player1.bullet !== 0) {
+            return Constants.MOVE_SHOOT;
+        } else {
+            if (player1.bomb !== 0) {
+                return Constants.MOVE_BOMB;
+            } else if (player2.focused && player1.shield !== 0) {
+                return Constants.MOVE_COVER;
+            } else if (player1.bullet !== 0 && !player1.focused) {
+                return Constants.MOVE_AIM;
+            } else {
+                var randomChoice = Math.floor((Math.random() * 10) + 1) > 6 && player1.shield !== 0;
+                if (randomChoice) {
+                    return Constants.MOVE_COVER;
+                } else {
+                    return Constants.MOVE_RELOAD;
+                }
+            }
+        }*/
     }
 
     /**
@@ -86,7 +106,16 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$log', '$timeou
      * analyse move response
      */
     function continueGame (moveResult) {
+        if (moveResult === Constants.MOVE_KO || moveResult === Constants.MOVE_DEFEAT) {
+            $log.log('[GAME] hum hum, something went wrong');
+            return false;
+        } else if (moveResult === Constants.MOVE_NOT_YOUR_TURN) {
+            return true;
+        } else if (moveResult === Constants.MOVE_OK) {
+            return true;
+        }
 
+        return false;
     }
 
 
@@ -95,22 +124,23 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$log', '$timeou
      */
     var gameOver = false;
     function play () {
-        //update urls
-        gameBoardUrl = gameBoardUrl.replace('@idPartie', $scope.gameId);
-        gameStatusUrl = gameStatusUrl.replace('@idPartie', $scope.gameId);
-
         if (!gameOver) {
             sendRequest(gameBoardUrl).then(function(board) {
+                $log.log('[BOARD] state ' + board);
                 var nextMove = computeNextMove(board);
                 sendRequest(gameStatusUrl).then(function(status) {
                     var canPlay = computeGameStatus(status);
                     if (status !== null && status) {
-                        makeMoveUrl = makeMoveUrl.replace('@move', nextMove);
-                        sendRequest(makeMoveUrl).then(function(result) {
-                            //var canContinue = 
+                        var newMoveUrl = angular.copy(makeMoveUrl).replace('@move', nextMove);
+                        sendRequest(newMoveUrl).then(function(result) {
+                            var canContinue = continueGame(result);
+                            if (canContinue) {
+                                play();
+                            }
                         });
                     } else {
                         gameOver = true;
+                        $scope.gameId = null;
                     }
                 });
             });
@@ -133,7 +163,6 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$log', '$timeou
     /**
      * create new bot game
      */
-    var level = 1;
     $scope.createGame = function() {
         if ($scope.teamId && $scope.botLevel) {
             createBotGameUrl = createBotGameUrl.replace('@level', $scope.botLevel).replace('@teamId', $scope.teamId);
@@ -143,13 +172,21 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$log', '$timeou
                 if (response !== Constants.UNKNOWN) {
                     //game created
                     $scope.gameId = response;
-                    //play();
+                    //update urls
+                    gameBoardUrl = gameBoardUrl.replace('@gameId', $scope.gameId);
+                    gameStatusUrl = gameStatusUrl.replace('@gameId', $scope.gameId).replace('@teamId', $scope.teamId);
+                    makeMoveUrl = makeMoveUrl.replace('@gameId', $scope.gameId).replace('@teamId', $scope.teamId);
+
                 } else {
                     //game not created yet
                     $timeout($scope.createGame(), 300);
                 }
             }, logError);
         }
+    };
+
+    $scope.launchGame = function() {
+        play();
     };
 
 }]);

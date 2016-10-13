@@ -21,6 +21,26 @@ app.factory('Constants', [function() {
         MOVE_RELOAD: 'RELOAD',
         MOVE_COVER: 'COVER',
         MOVE_AIM: 'AIM',
-        MOVE_BOMB: 'BOMB'
+        MOVE_BOMB: 'BOMB',
+
+        //EQUIPMENT
+        SHIELD: 7,
+        BOMB: 2
+
+
+
+
+        //EX BOARD//
+        /*EX_BOARD: {
+            "nbrActionLeft":30,
+            "player1": 
+                {"name":"iMOBILE","health":10,"bullet":1,"shield":7,"bomb":2,"focused":false,"cumulatedCovers":0},
+            "player2":
+                {"name":"Tank","health":10,"bullet":1,"shield":7,"bomb":2,"focused":false,"cumulatedCovers":0}
+        }*/
+
+        //test id
+        // 6db65c88-2a97-4b9e-a02e-26e525921a4f
+
     }
 }]);
