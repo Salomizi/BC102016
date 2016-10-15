@@ -17,7 +17,7 @@ app.factory('Urls', [function() {
         //Gameplay
         GAME_STATUS: '/battle-ws/duel/game/status/@gameId/@teamId',
         GAME_BOARD: '/battle-ws/duel/game/board/@gameId?format=JSON',
-        GAME_LAST_MOVE: '/battle-ws/duel/game/getlastmove/@gameId',
+        GAME_LAST_MOVE: '/battle-ws/duel/game/getlastmove/@gameId/@teamId',
         GAME_MAKE_MOVE: '/battle-ws/duel/game/play/@gameId/@teamId/@move'
 
 
