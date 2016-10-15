@@ -25,16 +25,20 @@
 <body ng-controller="MainCtrl">
     <div>
         <button ng-click="getTeamId()" ng-disabled="teamId">TEAM ID</button>
+        <span>{{teamId}}</span>
     </div>
     <div>
         <div>
             BOT LEVEL:
             <input ng-model="botLevel"/>
         </div>
-        <button ng-click="createGame()" ng-disabled="!teamId || gameId">CREATE BOT GAME</button>
+        <button ng-click="createGame()" ng-disabled="!teamId || gameId || !botLevel">CREATE BOT GAME</button>
     </div>
     <div>
         <button ng-click="launchGame()" ng-disabled="!teamId || !gameId">LAUNCH BOT GAME</button>          
     </div>
+    <ul>
+        <li ng-repeat="line in display track by $index">{{line}}</li>
+    <lu/>
 </body>
 </html>

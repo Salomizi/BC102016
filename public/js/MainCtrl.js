@@ -13,6 +13,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$log', '$timeou
     $scope.teamId = null;
     $scope.gameId = null;
     $scope.botLevel = null;
+    $scope.display = [];
 
     /**
      * generic request
@@ -30,6 +31,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$log', '$timeou
             }
         };
         req.onerror = function onError (error) {
+            $scope.display.push('[REQUEST] error : ' + error);
             $log.log('[REQUEST] error : ' + error);
             deferred.reject();
         };
@@ -46,6 +48,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$log', '$timeou
      */
     function testPing () {
         sendRequest(pingUrl).then(function(response) {
+            $scope.display.push(response);
             $log.log(response);
         });
     }
@@ -55,6 +58,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$log', '$timeou
      * generic error handling
      */
     function logError (error) {
+        $scope.display.push(error);
         $log.error(error);
     }
 
@@ -97,6 +101,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$log', '$timeou
             return false;
         } else {
             //something went wrong, or we won !
+            $scope.display.push(status);
             $log.log(status);
             return null;
         }
@@ -106,8 +111,13 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$log', '$timeou
      * analyse move response
      */
     function continueGame (moveResult) {
-        if (moveResult === Constants.MOVE_KO || moveResult === Constants.MOVE_DEFEAT) {
+        if (moveResult === Constants.MOVE_KO) {
+            $scope.display.push('[GAME] hum hum, something went wrong');
             $log.log('[GAME] hum hum, something went wrong');
+            return false;
+        } else if (moveResult === Constants.MOVE_DEFEAT) {
+            $scope.display.push('[GAME] you\'ve lost bitch');
+            $log.log('[GAME] you\'ve lost bitch');
             return false;
         } else if (moveResult === Constants.MOVE_NOT_YOUR_TURN) {
             return true;
@@ -126,6 +136,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$log', '$timeou
     function play () {
         if (!gameOver) {
             sendRequest(gameBoardUrl).then(function(board) {
+                $scope.display.push('[BOARD] state ' + board);                
                 $log.log('[BOARD] state ' + board);
                 var nextMove = computeNextMove(board);
                 sendRequest(gameStatusUrl).then(function(status) {
@@ -154,6 +165,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$log', '$timeou
     $scope.getTeamId = function () {
         if (!$scope.teamId) {
            sendRequest(teamIdUrl).then(function(response) {
+               $scope.display.push(response);
                 $log.log(response);
                 $scope.teamId = response;
             }, logError);
@@ -167,6 +179,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$log', '$timeou
         if ($scope.teamId && $scope.botLevel) {
             createBotGameUrl = createBotGameUrl.replace('@level', $scope.botLevel).replace('@teamId', $scope.teamId);
             sendRequest(createBotGameUrl).then(function(response) {
+                $scope.display.push(response);
                 $log.log(response);
 
                 if (response !== Constants.UNKNOWN) {
