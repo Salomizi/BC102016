@@ -1,13 +1,13 @@
 // Creates the MainCtrl Module and Controller.
 app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Urls', 'Constants', function($scope, $window, $http, $q, $timeout, Urls, Constants) {
     
-    var pingUrl = Urls.BASE_URL + Urls.PING;
-    var teamIdUrl = Urls.BASE_URL + Urls.USER;
-    var createBotGameUrl = Urls.BASE_URL + Urls.INIT_BOT_GAME;
-    var gameStatusUrl = Urls.BASE_URL + Urls.GAME_STATUS;
-    var gameBoardUrl = Urls.BASE_URL + Urls.GAME_BOARD;
-    var gameLastMove = Urls.BASE_URL + Urls.GAME_LAST_MOVE;
-    var makeMoveUrl = Urls.BASE_URL + Urls.GAME_MAKE_MOVE;
+    var pingUrl = Urls.PING;
+    var teamIdUrl = Urls.USER;
+    var createBotGameUrl = Urls.INIT_BOT_GAME;
+    var gameStatusUrl = Urls.GAME_STATUS;
+    var gameBoardUrl = Urls.GAME_BOARD;
+    var gameLastMove = Urls.GAME_LAST_MOVE;
+    var makeMoveUrl = Urls.GAME_MAKE_MOVE;
 
     //GAME variables
     $scope.teamId = null;
@@ -56,7 +56,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
      * generic error handling
      */
     function logError (error) {
-        $scope.display.push(error);
+        $scope.display.push('[ERROR] ' + error);
     }
 
     /**
@@ -107,7 +107,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
      */
     function continueGame (moveResult) {
         if (moveResult === Constants.MOVE_KO) {
-            $scope.display.push('[GAME] hum hum, something went wrong');
+            logError('hum hum, something went wrong');
             return false;
         } else if (moveResult === Constants.MOVE_DEFEAT) {
             $scope.display.push('[GAME] you\'ve lost bitch');
@@ -128,7 +128,6 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
     var gameOver = false;
     function play () {
         if (!gameOver) {
-
             sendRequest(gameBoardUrl).then(function(board) {
                 $scope.display.push('[BOARD] state ' + board);                
                 board = JSON.parse(board);
@@ -136,8 +135,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
                     if (status !== null && status) {
                         var canPlay = computeGameStatus(status);
                         if (canPlay) {
-                            var lastMoveUrl = angular.copy(gameLastMove);
-                            sendRequest(lastMoveUrl).then(function(lastMove) {
+                            sendRequest(gameLastMove).then(function(lastMove) {
                                 $scope.display.push('[GAME] ' + board.player2.name + ' -- lastMove ' + lastMove);
                                 var nextMove = computeNextMove(board, lastMove);
                                 $scope.display.push('[GAME] ' + board.player1.name + ' -- nextMove ' + nextMove);
