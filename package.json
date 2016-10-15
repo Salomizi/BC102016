@@ -10,8 +10,5 @@
     "gulp-inject": "4.1.0",
     "wiredep": "4.0.0",
     "bluebird": "3.4.6"
-  },
-  "devDependencies": {
-    "gulp": "3.9.1"
   }
 }
