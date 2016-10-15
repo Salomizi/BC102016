@@ -1,10 +1,10 @@
 app.factory('Urls', [function() {
 
     ///////INFO AT http://codeandplay.date/public/api.html /////////////////////////
+    var BASE_URL = 'http://www.codeandplay.date';
+    var DUEL_URL = '/battle-ws/duel';
 
     return {
-        BASE_URL: 'http://www.codeandplay.date',
-        DUEL_URL: '/battle-ws/duel',
         PING: BASE_URL + DUEL_URL + '/ping',
         USER: BASE_URL + DUEL_URL + '/player/getIdEquipe/iMOBILE/CeciEstUneRevolution!',
 
