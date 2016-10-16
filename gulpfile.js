@@ -7,8 +7,9 @@ var wiredep = require('wiredep')({ src: './public/index.html' });
 
 var paths = {
     js: [
+        './node_modules/lodash/lodash.js',
         './public/app.js',
-        './public/**/*.js',
+        './public/**/*.js'
     ]
 };
 

@@ -18,7 +18,12 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
     var iMobile = '';
     var foe = '';
     enemyPlayedMoves = {};
+<<<<<<< HEAD
     var currentTurn = -1;
+=======
+    var currentActionNumber = -1;
+    var staticUpperBound = 100;
+>>>>>>> 2172df6278f802eb1ccfe476c977c3fdf48b3ead
 
     /**
      * generic request
@@ -65,29 +70,92 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
     }
 
     /**
+     * generate random number
+     * @return random number between 0 and the given bound
+     */
+    function generateRandomNumber (upperBound) {
+        return Math.floor((Math.random() * upperBound) + 1);
+    }
+
+    /**
+     * analyse if we are in danger
+     * @return number of cover we need to take
+     */
+    var mustCoverBomb = false;
+    function inDanger (player1, foeLastMove) {
+        var minShieldToCoverBomb = 3;
+        var maxCumulatedCover = 2;
+
+        if (player1.shield === 0) {
+            return false;
+        }
+
+        if (foeLastMove === Constants.MOVE_BOMB) {
+            if (mustCoverBomb) {
+                //need to cover
+                mustCoverBomb = false;
+                return true;
+            } else if (player1.shield > minShieldToCoverBomb + 1) {
+                //cover at T+1
+                return true;
+            } else {
+                //will only cover at T+2 to minimize strike
+                mustCoverBomb = true;
+                return false;
+            }
+        } else if (foeLastMove === Constants.MOVE_AIM && player1.cumulatedCovers < maxCumulatedCover) {
+            if (generateRandomNumber(2) === 1) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * analyse game board and last opponent's move
      * @return move to make
      */
-    function computeNextMove (board) {
+    function computeNextMove (board, foeLastMove) {
         var player1 = board[iMobile];
         var player2 = board[foe];
+        var randomChoice;
+
         //TODO intelligence de batard
+
+        var inPotentialDanger = inDanger(player1, foeLastMove);
+        if (inPotentialDanger) {
+            return Constants.MOVE_COVER;
+        }
+
         if (player1.bullet !== 0) {
-            return Constants.MOVE_SHOOT;
-        } else {
-            if (player1.bomb !== 0) {
-                return Constants.MOVE_BOMB;
-            } else if (player2.focused && player1.shield !== 0) {
-                return Constants.MOVE_COVER;
-            } else if (player1.bullet !== 0 && !player1.focused) {
-                return Constants.MOVE_AIM;
+            if (player1.focused) {
+                //if we aimed, we must shoot
+                return Constants.MOVE_SHOOT;
             } else {
-                var randomChoice = Math.floor((Math.random() * 10) + 1) > 6 && player1.shield !== 0;
-                if (randomChoice) {
-                    return Constants.MOVE_COVER;
+                //random choice of action -> choice between 2 numbers
+                randomChoice = generateRandomNumber(staticUpperBound);
+                if (_.inRange(randomChoice, 0, staticUpperBound * 0.41)) {
+                    return Constants.MOVE_AIM;
+                } else if (_.inRange(randomChoice, staticUpperBound * 0.41, staticUpperBound * 0.71)) {
+                    return Constants.MOVE_SHOOT;
+                } else if (player1.bomb > 0) {
+                    return Constants.MOVE_BOMB;
                 } else {
-                    return Constants.MOVE_RELOAD;
+                    return Constants.MOVE_SHOOT;
                 }
+            }     
+        } else {
+            //random choice of action
+            randomChoice = generateRandomNumber(staticUpperBound);
+            if (_.inRange(randomChoice, 0, staticUpperBound * 0.71)) {
+                return Constants.MOVE_RELOAD;
+            } else if (player1.bomb > 0) {
+                return Constants.MOVE_BOMB;
+            } else {
+                return Constants.MOVE_RELOAD;
             }
         }
     }
@@ -161,7 +229,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
                                 $scope.display.push('[GAME] ' + board.player2.name + ' -- lastMove ' + lastMove);
                                 enemyPlayedMoves[board.nbrActionLeft] = lastMove;
                                 // compute our next move
-                                var nextMove = computeNextMove(board);
+                                var nextMove = computeNextMove(board, lastMove);
                                 $scope.display.push('[GAME] ' + board.player1.name + ' -- nextMove ' + nextMove);
                                 var newMoveUrl = angular.copy(makeMoveUrl).replace('@move', nextMove);
                                 sendRequest(newMoveUrl).then(function(result) {
