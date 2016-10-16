@@ -18,7 +18,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
     var iMobile = '';
     var foe = '';
     enemyPlayedMoves = {};
-    var currentActionNumber = -1;
+    var currentTurn = -1;
 
     /**
      * generic request
@@ -148,8 +148,8 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
                         foe = 'player1';
                     }
                 }
-                // we store the current action number
-                currentActionNumber = board.nbrActionLeft;
+                // we store the current turn number
+                currentTurn = board.nbrActionLeft;
                 // get game status
                 sendRequest(gameStatusUrl).then(function(status) {
                     // game is running
@@ -226,8 +226,8 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
         // initialize the players identifiers
         iMobile = '';
         foe = '';
-        // initializes the action number
-        currentActionNumber = -1;
+        // initializes the turn number
+        currentTurn = -1;
         // launch the game
         play();
     };
