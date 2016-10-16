@@ -15,7 +15,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
     $scope.botLevel = null;
     $scope.display = [];
     
-    var iMobile = '';
+    var iMOBILE = '';
     var foe = '';
     var enemyPlayedMoves = {};
     var currentTurn = -1;
@@ -25,6 +25,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
     //game variables
     var mustCoverBomb = false;
     var launchedBomb = false;
+    var aimed = null;
 
     /**
      * generic request
@@ -79,14 +80,28 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
     }
 
     /**
+     * brute try to see if the foe covers evertime we aim
+     */
+    function forceFoeToCover (foe, foeLastMove) {
+        if (foeLastMove === Constants.MOVE_COVER && foe.shield > 0) {
+            return true;
+        } else {
+            aimed = false;
+            return false;
+        }
+    }
+
+    /**
      * analyse if we are in danger
      * @return number of cover we need to take
      */
-    function inDanger (player1, foeLastMove) {
+    function inDanger (iMobile, foeLastMove) {
+        var dangerousSituation = false;
         var minShieldToCoverBomb = 3;
         var maxCumulatedCover = 2;
 
-        if (player1.shield === 0) {
+        if (iMobile.shield === 0) {
+            mustCoverBomb = false;
             return false;
         }
 
@@ -94,29 +109,32 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
         var bombLaunchFailed = launchedBomb && foeLastMove === Constants.MOVE_SHOOT;
         launchedBomb = false;
 
+        if (mustCoverBomb) {
+            //must cover
+            dangerousSituation = true;
+            mustCoverBomb = false;
+        }
+        
         if (foeLaunchedBomb || bombLaunchFailed) {
-            if (mustCoverBomb) {
-                //need to cover
-                mustCoverBomb = false;
-                return true;
-            } else if (player1.shield > minShieldToCoverBomb + 1) {
-                //cover at T+1
-                return true;
+            if (iMobile.shield > minShieldToCoverBomb + 1) {
+                //cover at T+1 and T+2
+                mustCoverBomb = true;
+                dangerousSituation = true;
             } else {
                 //will only cover at T+2 to minimize strike
                 mustCoverBomb = true;
-                return false;
+                dangerousSituation = false;
             }
-        } else if (foeLastMove === Constants.MOVE_AIM && player1.cumulatedCovers < maxCumulatedCover) {
+        } else if (foeLastMove === Constants.MOVE_AIM && iMobile.cumulatedCovers < maxCumulatedCover) {
             //random choice to cover or not when aimed
             if (generateRandomNumber(2) === 1) {
-                return false;
+                dangerousSituation = false;
             } else {
-                return true;
+                dangerousSituation = true;
             }
         }
 
-        return null;
+        return dangerousSituation;
     }
 
     /**
@@ -124,41 +142,58 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
      * @return move to make
      */
     function computeNextMove (board, foeLastMove) {
-        var player1 = board[iMobile];
-        var player2 = board[foe];
+        var iMobile = board[iMOBILE];
+        var them = board[foe];
         var randomChoice;
 
-        //TODO intelligence de batard
+        if (aimed) {
+            var shouldAimAgain = forceFoeToCover(them, foeLastMove);
+            if (shouldAimAgain) {
+                return Constants.MOVE_AIM;
+            }
+        }
 
-        var inPotentialDanger = inDanger(player1, foeLastMove);
+        var inPotentialDanger = inDanger(iMobile, foeLastMove);
         if (inPotentialDanger) {
             return Constants.MOVE_COVER;
         }
 
-        if (player1.bullet !== 0) {
-            if (player1.focused) {
+        if (iMobile.bullet !== 0) {
+            if (them.health === 1) {
+                //finish him !
+                return Constants.MOVE_SHOOT;
+            }
+
+            if (iMobile.focused) {
                 //if we aimed, we must shoot
                 return Constants.MOVE_SHOOT;
             } else {
                 //random choice of action -> choice between 2 numbers
                 randomChoice = generateRandomNumber(staticUpperBound);
                 if (_.inRange(randomChoice, 0, staticUpperBound * 0.41)) {
+                    if (aimed === null && board.nbrActionLeft !== Constants.GAME_ACTIONS_COUNT) {
+                        //try the brute force strategy
+                        aimed = true;
+                    }
                     return Constants.MOVE_AIM;
                 } else if (_.inRange(randomChoice, staticUpperBound * 0.41, staticUpperBound * 0.71)) {
                     return Constants.MOVE_SHOOT;
-                } else if (player1.bomb > 0) {
+                } else if (iMobile.bomb > 0) {
                     launchedBomb = true;
                     return Constants.MOVE_BOMB;
                 } else {
                     return Constants.MOVE_SHOOT;
                 }
             }     
+        } else if (them.health === 1) {
+            //try a final strike
+            return Constants.MOVE_RELOAD;
         } else {
             //random choice of action
             randomChoice = generateRandomNumber(staticUpperBound);
             if (_.inRange(randomChoice, 0, staticUpperBound * 0.71)) {
                 return Constants.MOVE_RELOAD;
-            } else if (player1.bomb > 0) {
+            } else if (iMobile.bomb > 0) {
                 launchedBomb = true;
                 return Constants.MOVE_BOMB;
             } else {
@@ -216,7 +251,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
                 // should we compute the players names
                 if (iMobile.length === 0) {
                     if (board.player1.name === 'iMOBILE') {
-                        iMobile = 'player1';
+                        iMOBILE = 'player1';
                         foe = 'player2';
                     } else {
                         iMobile = 'player2';

@@ -3,6 +3,8 @@ app.factory('Constants', [function() {
     ///////INFO AT http://codeandplay.date/public/api.html /////////////////////////
 
     return {
+        GAME_ACTIONS_COUNT: 30,
+
         UNKNOWN: 'NA',
 
         STATUS_YES: 'CANPLAY',
