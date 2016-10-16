@@ -22,6 +22,10 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
     var currentActionNumber = -1;
     var staticUpperBound = 100;
 
+    //game variables
+    var mustCoverBomb = false;
+    var launchedBomb = false;
+
     /**
      * generic request
      * $http does not work with the test API
@@ -78,7 +82,6 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
      * analyse if we are in danger
      * @return number of cover we need to take
      */
-    var mustCoverBomb = false;
     function inDanger (player1, foeLastMove) {
         var minShieldToCoverBomb = 3;
         var maxCumulatedCover = 2;
@@ -87,7 +90,11 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
             return false;
         }
 
-        if (foeLastMove === Constants.MOVE_BOMB) {
+        var foeLaunchedBomb = foeLastMove === Constants.MOVE_BOMB;
+        var bombLaunchFailed = launchedBomb && foeLastMove === Constants.MOVE_SHOOT;
+        launchedBomb = false;
+
+        if (foeLaunchedBomb || bombLaunchFailed) {
             if (mustCoverBomb) {
                 //need to cover
                 mustCoverBomb = false;
@@ -101,6 +108,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
                 return false;
             }
         } else if (foeLastMove === Constants.MOVE_AIM && player1.cumulatedCovers < maxCumulatedCover) {
+            //random choice to cover or not when aimed
             if (generateRandomNumber(2) === 1) {
                 return false;
             } else {
@@ -139,6 +147,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
                 } else if (_.inRange(randomChoice, staticUpperBound * 0.41, staticUpperBound * 0.71)) {
                     return Constants.MOVE_SHOOT;
                 } else if (player1.bomb > 0) {
+                    launchedBomb = true;
                     return Constants.MOVE_BOMB;
                 } else {
                     return Constants.MOVE_SHOOT;
@@ -150,6 +159,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
             if (_.inRange(randomChoice, 0, staticUpperBound * 0.71)) {
                 return Constants.MOVE_RELOAD;
             } else if (player1.bomb > 0) {
+                launchedBomb = true;
                 return Constants.MOVE_BOMB;
             } else {
                 return Constants.MOVE_RELOAD;
@@ -205,7 +215,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
                 board = JSON.parse(board);
                 // should we compute the players names
                 if (iMobile.length === 0) {
-                    if (board.player1.name === 'iMobile') {
+                    if (board.player1.name === 'iMOBILE') {
                         iMobile = 'player1';
                         foe = 'player2';
                     } else {
