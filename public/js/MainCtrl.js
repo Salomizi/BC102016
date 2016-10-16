@@ -17,13 +17,10 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
     
     var iMobile = '';
     var foe = '';
-    enemyPlayedMoves = {};
-<<<<<<< HEAD
+    var enemyPlayedMoves = {};
     var currentTurn = -1;
-=======
     var currentActionNumber = -1;
     var staticUpperBound = 100;
->>>>>>> 2172df6278f802eb1ccfe476c977c3fdf48b3ead
 
     /**
      * generic request
