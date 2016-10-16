@@ -17,7 +17,8 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
     
     var iMobile = '';
     var foe = '';
-    var enemyPlayedMoves = [];
+    enemyPlayedMoves = {};
+    var currentActionNumber = -1;
 
     /**
      * generic request
@@ -147,6 +148,8 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
                         foe = 'player1';
                     }
                 }
+                // we store the current action number
+                currentActionNumber = board.nbrActionLeft;
                 // get game status
                 sendRequest(gameStatusUrl).then(function(status) {
                     // game is running
@@ -156,7 +159,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
                             // retrieve the last foe's move
                             sendRequest(gameLastMove).then(function(lastMove) {
                                 $scope.display.push('[GAME] ' + board.player2.name + ' -- lastMove ' + lastMove);
-                                enemyPlayedMoves.push(lastMove);
+                                enemyPlayedMoves[board.nbrActionLeft] = lastMove;
                                 // compute our next move
                                 var nextMove = computeNextMove(board);
                                 $scope.display.push('[GAME] ' + board.player1.name + ' -- nextMove ' + nextMove);
@@ -223,6 +226,8 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
         // initialize the players identifiers
         iMobile = '';
         foe = '';
+        // initializes the action number
+        currentActionNumber = -1;
         // launch the game
         play();
     };
