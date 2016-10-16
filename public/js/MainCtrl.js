@@ -147,8 +147,10 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
         var randomChoice;
 
         if (aimed) {
+            //check if foe fell in the trap
             var shouldAimAgain = forceFoeToCover(them, foeLastMove);
             if (shouldAimAgain) {
+                //he did, let's aim again to see if it is real
                 return Constants.MOVE_AIM;
             }
         }
