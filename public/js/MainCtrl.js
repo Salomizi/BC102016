@@ -14,6 +14,10 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
     $scope.gameId = null;
     $scope.botLevel = null;
     $scope.display = [];
+    
+    var iMobile = '';
+    var foe = '';
+    var enemyPlayedMoves = [];
 
     /**
      * generic request
@@ -63,9 +67,9 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
      * analyse game board and last opponent's move
      * @return move to make
      */
-    function computeNextMove (board, lastMove) {
-        var player1 = board.player1;
-        var player2 = board.player2;
+    function computeNextMove (board) {
+        var player1 = board[iMobile];
+        var player2 = board[foe];
         //TODO intelligence de batard
         if (player1.bullet !== 0) {
             return Constants.MOVE_SHOOT;
@@ -129,18 +133,36 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
     function play () {
         if (!gameOver) {
             sendRequest(gameBoardUrl).then(function(board) {
-                $scope.display.push('[BOARD] state ' + board);                
+                // display the board data
+                $scope.display.push('[BOARD] state ' + board);
+                // parse the data to JSON                
                 board = JSON.parse(board);
+                // should we compute the players names
+                if (iMobile.length === 0) {
+                    if (board.player1.name === 'iMobile') {
+                        iMobile = 'player1';
+                        foe = 'player2';
+                    } else {
+                        iMobile = 'player2';
+                        foe = 'player1';
+                    }
+                }
+                // get game status
                 sendRequest(gameStatusUrl).then(function(status) {
+                    // game is running
                     if (status !== null && status) {
-                        var canPlay = computeGameStatus(status);
-                        if (canPlay) {
+                        // can we play
+                        if (computeGameStatus(status)) {
+                            // retrieve the last foe's move
                             sendRequest(gameLastMove).then(function(lastMove) {
                                 $scope.display.push('[GAME] ' + board.player2.name + ' -- lastMove ' + lastMove);
-                                var nextMove = computeNextMove(board, lastMove);
+                                enemyPlayedMoves.push(lastMove);
+                                // compute our next move
+                                var nextMove = computeNextMove(board);
                                 $scope.display.push('[GAME] ' + board.player1.name + ' -- nextMove ' + nextMove);
                                 var newMoveUrl = angular.copy(makeMoveUrl).replace('@move', nextMove);
                                 sendRequest(newMoveUrl).then(function(result) {
+                                    // can we continue
                                     var canContinue = continueGame(result);
                                     if (canContinue) {
                                         play();
@@ -148,6 +170,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
                                 });
                             });
                         }
+                    // game is over
                     } else {
                         gameOver = true;
                         $scope.gameId = null;
@@ -197,6 +220,10 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
     };
 
     $scope.launchGame = function() {
+        // initialize the players identifiers
+        iMobile = '';
+        foe = '';
+        // launch the game
         play();
     };
 
