@@ -4,6 +4,7 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
     var pingUrl = Urls.PING;
     var teamIdUrl = Urls.USER;
     var createBotGameUrl = Urls.INIT_BOT_GAME;
+    var createVersusGameUrl = Urls.INIT_PLAYER_GAME;
     var gameStatusUrl = Urls.GAME_STATUS;
     var gameBoardUrl = Urls.GAME_BOARD;
     var gameLastMove = Urls.GAME_LAST_MOVE;
@@ -284,6 +285,9 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
                                     }
                                 });
                             });
+                        } else {
+                            gameOver = true;
+                            $scope.gameId = null;
                         }
                     // game is over
                     } else {
@@ -307,30 +311,46 @@ app.controller('MainCtrl', ['$scope', '$window', '$http', '$q', '$timeout', 'Url
             }, logError);
         }
     };
+    $scope.getTeamId();
 
     /**
      * create new bot game
      */
-    $scope.createGame = function() {
+    function createGame(url) {
+        sendRequest(url).then(function(response) {
+            $scope.display.push(response)
+
+            if (response !== Constants.UNKNOWN) {
+                //game created
+                $scope.gameId = response;
+                //update urls
+                gameBoardUrl = gameBoardUrl.replace('@gameId', $scope.gameId);
+                gameStatusUrl = gameStatusUrl.replace('@gameId', $scope.gameId).replace('@teamId', $scope.teamId);
+                gameLastMove = gameLastMove.replace('@gameId', $scope.gameId).replace('@teamId', $scope.teamId);
+                makeMoveUrl = makeMoveUrl.replace('@gameId', $scope.gameId).replace('@teamId', $scope.teamId);
+
+            } else {
+                //game not created yet
+                $timeout($scope.createGame(), 300);
+            }
+        }, logError);
+    };
+
+    /**
+     * creates a bot game
+     */
+    $scope.createBotGame = function() {
         if ($scope.teamId && $scope.botLevel) {
-            createBotGameUrl = createBotGameUrl.replace('@level', $scope.botLevel).replace('@teamId', $scope.teamId);
-            sendRequest(createBotGameUrl).then(function(response) {
-                $scope.display.push(response)
+            createGame(createBotGameUrl.replace('@level', $scope.botLevel).replace('@teamId', $scope.teamId));
+        }
+    };
 
-                if (response !== Constants.UNKNOWN) {
-                    //game created
-                    $scope.gameId = response;
-                    //update urls
-                    gameBoardUrl = gameBoardUrl.replace('@gameId', $scope.gameId);
-                    gameStatusUrl = gameStatusUrl.replace('@gameId', $scope.gameId).replace('@teamId', $scope.teamId);
-                    gameLastMove = gameLastMove.replace('@gameId', $scope.gameId).replace('@teamId', $scope.teamId);
-                    makeMoveUrl = makeMoveUrl.replace('@gameId', $scope.gameId).replace('@teamId', $scope.teamId);
-
-                } else {
-                    //game not created yet
-                    $timeout($scope.createGame(), 300);
-                }
-            }, logError);
+    /**
+     * creates versus game
+     */
+    $scope.createVersusGame = function() {
+        if ($scope.teamId) {
+            createGame(createVersusGameUrl.replace('@teamId', $scope.teamId));
         }
     };
 

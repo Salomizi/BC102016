@@ -24,22 +24,27 @@
 
 </head>
 <body ng-controller="MainCtrl">
-    <div>
-        <button ng-click="getTeamId()" ng-disabled="teamId">TEAM ID</button>
-        <span>{{teamId}}</span>
-    </div>
-    <div>
+    <div style="height: 90vh; padding: 2vh;">
         <div>
-            BOT LEVEL:
-            <input ng-model="botLevel"/>
+            <button ng-click="getTeamId()" ng-disabled="teamId">TEAM ID</button>
+            <span>{{teamId}}</span>
         </div>
-        <button ng-click="createGame()" ng-disabled="!teamId || gameId || !botLevel">CREATE BOT GAME</button>
+        <div>
+            <div>
+                BOT LEVEL:
+                <input ng-model="botLevel"/>
+            </div>
+            <button ng-click="createBotGame()" ng-disabled="!teamId || gameId || !botLevel">CREATE BOT GAME</button>
+        </div>
+        <div>
+            <button ng-click="createVersusGame()" ng-disabled="!teamId || gameId">CREATE VERSUS GAME</button>          
+        </div>
+        <div>
+            <button ng-click="launchGame()" ng-disabled="!teamId || !gameId">LAUNCH GAME</button>          
+        </div>
+        <div style="height:80vh;overflow-y: scroll; margin-top: 2vh;">
+            <div ng-repeat="line in display track by $index">{{line}}</div>
+        </div>
     </div>
-    <div>
-        <button ng-click="launchGame()" ng-disabled="!teamId || !gameId">LAUNCH BOT GAME</button>          
-    </div>
-    <ul>
-        <li ng-repeat="line in display track by $index">{{line}}</li>
-    <lu/>
 </body>
 </html>
