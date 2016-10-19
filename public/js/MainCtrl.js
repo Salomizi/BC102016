@@ -376,5 +376,16 @@ app.controller('MainCtrl', [
             }
         , true);
 
+        $scope.lineColor = function(line) {
+            if (line.indexOf('[BOARD]') !== -1) {
+                return {
+                    color: '#01d'
+                };
+            } else {
+                return {
+                    color: '#d00'
+                };
+            }
+        }
     }
 ]);

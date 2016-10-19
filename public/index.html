@@ -44,7 +44,7 @@
             </div>
         </div>
         <div style="height:70vh;overflow-y: scroll; padding: 2vh; background:no-repeat center url(assets/logo_iMOBILE.png);">
-            <div ng-repeat="line in display track by $index">{{line}}</div>
+            <div ng-repeat="line in display track by $index" ng-style="lineColor(line)">{{line}}</div>
             <div id="bottom"></div>
         </div>
     </div>
