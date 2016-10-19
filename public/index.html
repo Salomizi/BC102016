@@ -22,27 +22,28 @@
     <script src="js/Urls.js"></script>
     <!-- endinject -->
 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
 </head>
 <body ng-controller="MainCtrl">
-    <div style="height: 90vh; padding: 2vh;background:no-repeat center url(assets/logo_iMOBILE.png);">
-        <div>
-            <button ng-click="getTeamId()" ng-disabled="teamId">TEAM ID</button>
-            <span>{{teamId}}</span>
-        </div>
-        <div>
+    <div style="height: 90vh;">
+        <div style="background-color: #eee;padding: 2vh;">
             <div>
+                <span style="margin-right:2vw;">TEAM ID : {{teamId}}</span><button class="btn btn-primary" ng-click="getTeamId()" ng-disabled="teamId">REFRESH</button>
+            </div>
+            <div style="margin-top:2vh;">
                 BOT LEVEL:
                 <input ng-model="botLevel"/>
             </div>
-            <button ng-click="createBotGame()" ng-disabled="!teamId || gameId || !botLevel">CREATE BOT GAME</button>
+            <div style="margin-top:2vh;">
+                <button class="btn btn-primary" ng-click="createBotGame()" ng-disabled="!teamId || gameId || !botLevel">CREATE BOT GAME</button>
+                <button class="btn btn-primary" ng-click="createVersusGame()" ng-disabled="!teamId || gameId" style="margin-right:2vw;">CREATE VERSUS GAME</button>          
+            </div>
+            <div style="margin-top:2vh;">
+                <button class="btn btn-primary" ng-click="launchGame()" ng-disabled="!teamId || !gameId">LAUNCH GAME</button>          
+            </div>
         </div>
-        <div>
-            <button ng-click="createVersusGame()" ng-disabled="!teamId || gameId">CREATE VERSUS GAME</button>          
-        </div>
-        <div>
-            <button ng-click="launchGame()" ng-disabled="!teamId || !gameId">LAUNCH GAME</button>          
-        </div>
-        <div style="height:80vh;overflow-y: scroll; margin-top: 2vh;">
+        <div style="height:70vh;overflow-y: scroll; padding: 2vh; background:no-repeat center url(assets/logo_iMOBILE.png);">
             <div ng-repeat="line in display track by $index">{{line}}</div>
             <div id="bottom"></div>
         </div>
