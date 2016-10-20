@@ -14,6 +14,8 @@ app.controller('MainCtrl', [
 
         var gameUrl;
         
+        var noPerso = 0;
+        var team = ['ORC','SHAMAN','PRETRE'];
         //max persos choisis
         var maxCharactersChosen = 3;
         var numberCharactersChosen = 0;
@@ -247,6 +249,15 @@ app.controller('MainCtrl', [
 
             return false;
         }
+        /**
+         * choose Character
+         */
+
+        function chooseCharacter(board){
+           // if(board.getlastmove()){ 
+            noPerso++;           
+            return team[noPerso-1];                              
+        }
 
 
         /**
@@ -263,7 +274,7 @@ app.controller('MainCtrl', [
 
                     //choose characters
                     if (board.nbrTurnsLeft > 50) {
-                        chooseCharacter();
+                        chooseCharacter(board);                        
                     } else {
                         // should we compute the players names
                         if (board.playerBoards[0].playerName === 'iMOBILE') {
