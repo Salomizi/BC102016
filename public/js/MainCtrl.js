@@ -154,7 +154,24 @@ app.controller('MainCtrl', [
         function computeNextMove (board, foeLastMove) {
             var iMobile = iMOBILE;
             var them = foe;
+            var fightersObj = iMOBILE.fighters;
+            var fighters = _.mapKeys(fightersObj, function(fighter) {
+                return fighter.fighterClass;
+            });
+            var PRIEST = fighters['PRIEST'];
+            var CHAMAN = fighters['CHAMAN'];
+            var ORC = fighters['ORC'];
             var randomChoice;
+
+            var priestMove = PRIEST.orderNumberInTeam;
+            var chamanMove = CHAMAN.orderNumberInTeam;
+            var orcMove = ORC.orderNumberInTeam;
+
+            priestMove = priestMove + 
+            chamanMove = chamanMove + 
+            orcMove = orcMove + 
+
+
 
             if (aimed) {
                 //check if foe fell in the trap
