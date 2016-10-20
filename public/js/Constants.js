@@ -19,12 +19,24 @@ app.factory('Constants', [function() {
         MOVE_DEFEAT: 'GAMEOVER',
         MOVE_NOT_YOUR_TURN: 'NOTYET',
 
+        //HEROES
+        HERO_ARCHER: 'ARCHER',
+        HERO_CHAMAN: 'CHAMAN',
+        HERO_GUARD: 'GUARD',
+        HERO_ORC: 'ORC',
+        HERO_PALADIN: 'PALADIN',
+        HERO_PRIEST: 'PRIEST',
+
         //MOVES
         MOVE_ATTACK: 'ATTACK',
         MOVE_CHARGE: 'CHARGE',
-        MOVE_COVER: 'COVER',
-        MOVE_AIM: 'AIM',
-        MOVE_BOMB: 'BOMB',
+        MOVE_CLEANSE: 'CLEANSE',
+        MOVE_DEFEND: 'DEFEND',
+        MOVE_FIREBOLT: 'FIREBOLT',
+        MOVE_YELL: 'YELL',
+        MOVE_HEAL: 'HEAL',
+        MOVE_PROTECT: 'PROTECT',
+        MOVE_REST: 'REST',
 
         //EQUIPMENT
         SHIELD: 7,
