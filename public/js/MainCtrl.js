@@ -160,77 +160,31 @@ app.controller('MainCtrl', [
             var fighters = _.mapKeys(fightersObj, function(fighter) {
                 return fighter.fighterClass;
             });
+
+            var target;
+
+            var foeFightersObj = foe.fighters;
+            for (var i = 0; i < foeFightersObj.length; i++) {
+                var possibleTarget = foeFightersObj[i];
+                if (!possibleTarget.isDead) {
+                    target = possibleTarget.orderNumberInTeam;
+                }
+            }
+
             var PRIEST = fighters['PRIEST'];
             var CHAMAN = fighters['CHAMAN'];
             var ORC = fighters['ORC'];
             var randomChoice;
 
-            var priestMove = PRIEST.orderNumberInTeam;
-            var chamanMove = CHAMAN.orderNumberInTeam;
-            var orcMove = ORC.orderNumberInTeam;
+            var priestMove = 'A' + PRIEST.orderNumberInTeam + ',';
+            var chamanMove = 'A' + CHAMAN.orderNumberInTeam + ',';
+            var orcMove = 'A' + ORC.orderNumberInTeam + ',';
 
-            priestMove = priestMove + 
-            chamanMove = chamanMove + 
-            orcMove = orcMove + 
+            priestMove = priestMove + Constants.MOVE_ATTACK + ',E' + target;
+            chamanMove = chamanMove + Constants.MOVE_ATTACK + ',E' + target;
+            orcMove = orcMove + Constants.MOVE_ATTACK + ',E' + target;
 
-
-
-            if (aimed) {
-                //check if foe fell in the trap
-                var shouldAimAgain = forceFoeToCover(them, foeLastMove);
-                if (shouldAimAgain) {
-                    //he did, let's aim again to see if it is real
-                    return Constants.MOVE_AIM;
-                }
-            }
-
-            var inPotentialDanger = inDanger(iMobile, foeLastMove);
-            if (inPotentialDanger) {
-                return Constants.MOVE_COVER;
-            }
-
-            if (iMobile.bullet !== 0) {
-                if (them.health === 1) {
-                    //finish him !
-                    return Constants.MOVE_SHOOT;
-                }
-
-                if (iMobile.focused) {
-                    //if we aimed, we must shoot
-                    return Constants.MOVE_SHOOT;
-                } else {
-                    //random choice of action -> choice between 2 numbers
-                    randomChoice = generateRandomNumber(staticUpperBound);
-                    if (_.inRange(randomChoice, 0, staticUpperBound * 0.41)) {
-                        if (aimed === null && board.nbrActionLeft !== Constants.GAME_ACTIONS_COUNT) {
-                            //try the brute force strategy
-                            aimed = true;
-                        }
-                        return Constants.MOVE_AIM;
-                    } else if (_.inRange(randomChoice, staticUpperBound * 0.41, staticUpperBound * 0.71)) {
-                        return Constants.MOVE_SHOOT;
-                    } else if (iMobile.bomb > 0) {
-                        launchedBomb = true;
-                        return Constants.MOVE_BOMB;
-                    } else {
-                        return Constants.MOVE_SHOOT;
-                    }
-                }     
-            } else if (them.health === 1) {
-                //try a final strike
-                return Constants.MOVE_RELOAD;
-            } else {
-                //random choice of action
-                randomChoice = generateRandomNumber(staticUpperBound);
-                if (_.inRange(randomChoice, 0, staticUpperBound * 0.71)) {
-                    return Constants.MOVE_RELOAD;
-                } else if (iMobile.bomb > 0) {
-                    launchedBomb = true;
-                    return Constants.MOVE_BOMB;
-                } else {
-                    return Constants.MOVE_RELOAD;
-                }
-            }
+            return priestMove + '$' + chamanMove + '$' + orcMove;
         }
 
         /**
