@@ -20,32 +20,32 @@ app.factory('Constants', [function() {
         MOVE_NOT_YOUR_TURN: 'NOTYET',
 
         //HEROES
-        HERO_ARCHER: {
+        ARCHER: {
             name: 'ARCHER',
             pv: 20,
             special: 'FIREBOLT'
         },
-        HERO_CHAMAN: {
+        CHAMAN: {
             name:  'CHAMAN',
             pv: 20,
             special: 'CLEANSE'
         },
-        HERO_GUARD: {
+        GUARD: {
             name:  'GUARD',
             pv: 30,
             special: 'PROTECT'
         },
-        HERO_ORC: {
+        ORC: {
             name:  'ORC',
             pv: 30,
             special: 'YELL'
         },
-        HERO_PALADIN: {
+        PALADIN: {
             name:  'PALADIN',
             pv: 30,
             special: 'CHARGE'
         },
-        HERO_PRIEST: {
+        PRIEST: {
             name:  'PRIEST',
             pv: 20,
             special: 'HEAL'
