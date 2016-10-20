@@ -6,7 +6,7 @@ app.factory('Urls', [function() {
 
     return {
         PING: BASE_URL + DUEL_URL + '/ping',
-        USER: BASE_URL + DUEL_URL + '/player/getIdEquipe/iMOBILE/CeciEstUneRevolution!',
+        USER: BASE_URL + DUEL_URL + '/player/getIdEquipe/iMOBILE/_iMin1tel!?%',
 
         //vs player
         INIT_PLAYER_GAME: BASE_URL + DUEL_URL + '/versus/next/@teamId',
