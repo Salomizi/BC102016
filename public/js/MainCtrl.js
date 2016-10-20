@@ -166,9 +166,11 @@ app.controller('MainCtrl', [
             var foeFightersObj = foe.fighters;
             for (var i = 0; i < foeFightersObj.length; i++) {
                 var possibleTarget = foeFightersObj[i];
-                if (!possibleTarget.isDead) {
+                if (possibleTarget.fighterClass === 'PRIEST') {
                     target = possibleTarget.orderNumberInTeam;
                     break;
+                } else if (!possibleTarget.isDead) {
+                    target = possibleTarget.orderNumberInTeam;
                 }
             }
 
