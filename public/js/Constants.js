@@ -34,13 +34,7 @@ app.factory('Constants', [function() {
 
 
         //EX BOARD//
-        /*EX_BOARD: {
-            "nbrActionLeft":30,
-            "player1": 
-                {"name":"iMOBILE","health":10,"bullet":1,"shield":7,"bomb":2,"focused":false,"cumulatedCovers":0},
-            "player2":
-                {"name":"Tank","health":10,"bullet":1,"shield":7,"bomb":2,"focused":false,"cumulatedCovers":0}
-        }*/
+        //{"playerBoards":[{"playerId":"0","playerName":"iMOBILE","fighters":null},{"playerId":"1","playerName":"Dr B. Gaius","fighters":null}],"nbrTurnsLeft":53,"playerMoves":null}
 
         //test id
         // 6db65c88-2a97-4b9e-a02e-26e525921a4f
