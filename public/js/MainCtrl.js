@@ -1,7 +1,7 @@
 // Creates the MainCtrl Module and Controller.
 app.controller('MainCtrl', [
-    '$scope', '$window', '$http', '$q', '$timeout', 'Urls', 'Constants', '$location', '$anchorScroll', 
-    function($scope, $window, $http, $q, $timeout, Urls, Constants, $location, $anchorScroll) {
+    '$scope', '$window', '$http', '$q', '$timeout', 'Urls', 'Constants', '$location', '$anchorScroll', 'ComputeMove', 
+    function($scope, $window, $http, $q, $timeout, Urls, Constants, $location, $anchorScroll, ComputeMove) {
     
         var pingUrl = Urls.PING;
         var teamIdUrl = Urls.USER;
@@ -193,15 +193,7 @@ app.controller('MainCtrl', [
             var ORC = fighters['ORC'];
             var randomChoice;
 
-            var priestMove = 'A' + PRIEST.orderNumberInTeam + ',';
-            var chamanMove = 'A' + CHAMAN.orderNumberInTeam + ',';
-            var orcMove = 'A' + ORC.orderNumberInTeam + ',';
-
-            priestMove = priestMove + Constants.MOVE_ATTACK + ',E' + target;
-            chamanMove = chamanMove + Constants.MOVE_ATTACK + ',E' + target;
-            orcMove = orcMove + Constants.MOVE_ATTACK + ',E' + target;
-
-            return priestMove + '$' + chamanMove + '$' + orcMove;
+            return ComputeMove.getNetMove(board, target);
         }
 
         /**
@@ -242,9 +234,15 @@ app.controller('MainCtrl', [
          */
 
         function chooseCharacter(board){
-           // if(board.getlastmove()){ 
-            noPerso++;           
-            return angular.copy(makeMoveUrl).replace('@move', team[noPerso-1]);                              
+            var turn = board.nbrTurnsLeft;
+            if (turn === 53) {
+                noPerso = 0;
+            } else if (turn === 52) {
+                noPerso = 1;
+            } else {
+                noPerso = 2;
+            }      
+            return angular.copy(makeMoveUrl).replace('@move', team[noPerso]);                              
         }
 
 
@@ -260,59 +258,62 @@ app.controller('MainCtrl', [
                     // parse the data to JSON                
                     board = JSON.parse(board);
 
-                    //choose characters
-                    if (board.nbrTurnsLeft > 50) {                         
-                        sendRequest(chooseCharacter(board)).then(function(result) {
-                            // can we continue
-                            var canContinue = continueGame(result);
-                            if (canContinue) {
-                                play();
-                            }
-                        });                     
-                    } else {
-                        // should we compute the players names
-                        if (board.playerBoards[0].playerName === 'iMOBILE') {
-                            iMOBILE = board.playerBoards[0];
-                            foe = board.playerBoards[1];
-                        } else {
-                            iMOBILE = board.playerBoards[1];
-                            foe = board.playerBoards[0];
-                        }
-                        // we store the current turn number
-                        currentTurn = board.nbrTurnsLeft;
-                        // get game status
-                        sendRequest(gameStatusUrl).then(function(status) {
-                            // game is running
-                            if (status !== null && status) {
-                                // can we play
-                                if (computeGameStatus(status)) {
-                                    // retrieve the last foe's move
-                                    sendRequest(gameLastMove).then(function(lastMove) {
-                                        $scope.display.push('[GAME] ' + foe.playerName + ' -- lastMove ' + lastMove);
-                                        enemyPlayedMoves[board.nbrTurnsLeft] = lastMove;
-                                        // compute our next move
-                                        var nextMove = computeNextMove(board, lastMove);
-                                        $scope.display.push('[GAME] ' + iMOBILE.playerName + ' -- nextMove ' + nextMove);
-                                        var newMoveUrl = angular.copy(makeMoveUrl).replace('@move', nextMove);
-                                        sendRequest(newMoveUrl).then(function(result) {
+                    $scope.display.push('[GAME] ' + board.nbrTurnsLeft);
+
+                    // get game status
+                    sendRequest(gameStatusUrl).then(function(status) {
+                        // game is running
+                        if (status !== null && status) {
+                            // can we play
+                            switch (status) {
+                                case Constants.STATUS_YES:
+                                    //choose characters
+                                    if (board.nbrTurnsLeft > 50) {
+                                        sendRequest(chooseCharacter(board)).then(function(result) {
                                             // can we continue
                                             var canContinue = continueGame(result);
                                             if (canContinue) {
                                                 play();
                                             }
                                         });
-                                    });
-                                } else {
-                                    gameOver = true;
-                                    $scope.gameId = null;
-                                }
-                            // game is over
-                            } else {
-                                gameOver = true;
-                                $scope.gameId = null;
+                                    } else {
+                                        // should we compute the players names
+                                        if (board.playerBoards[0].playerName === 'iMOBILE') {
+                                            iMOBILE = board.playerBoards[0];
+                                            foe = board.playerBoards[1];
+                                        } else {
+                                            iMOBILE = board.playerBoards[1];
+                                            foe = board.playerBoards[0];
+                                        }
+                                        // we store the current turn number
+                                        currentTurn = board.nbrTurnsLeft;
+
+                                        // retrieve the last foe's move
+                                        sendRequest(gameLastMove).then(function(lastMove) {
+                                            $scope.display.push('[GAME] ' + foe.playerName + ' -- lastMove ' + lastMove);
+                                            enemyPlayedMoves[board.nbrTurnsLeft] = lastMove;
+                                            // compute our next move
+                                            var nextMove = computeNextMove(board, lastMove);
+                                            $scope.display.push('[GAME] ' + iMOBILE.playerName + ' -- nextMove ' + nextMove);
+                                            var newMoveUrl = angular.copy(makeMoveUrl).replace('@move', nextMove);
+                                            sendRequest(newMoveUrl).then(function(result) {
+                                                // can we continue
+                                                var canContinue = continueGame(result);
+                                                if (canContinue) {
+                                                    play();
+                                                }
+                                            });
+                                        });
+                                    }
+                                    break;
+                                case Constants.STATUS_NO:
+                                    play();
+                                    break;
+                                default:
+                                    break;
                             }
-                        });
-                    }
+                        }
+                    });                    
                 });
             }
         }
@@ -335,7 +336,7 @@ app.controller('MainCtrl', [
 
                 } else {
                     //game not created yet
-                    $timeout($scope.createGame(), 300);
+                    $timeout(createGame(), 300);
                 }
             }, logError);
         }

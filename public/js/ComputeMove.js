@@ -1,4 +1,4 @@
-app.factory('ComputeMove', [function () {
+app.factory('ComputeMove', ['Constants', function (Constants) {
 
     ///////INFO AT http://codeandplay.date/public/api.html /////////////////////////
 
@@ -24,26 +24,29 @@ app.factory('ComputeMove', [function () {
         }
 
         for (var i = 0; i < 3; i++) {
+            if (action.length !== 0) {
+                action += '$';
+            }
             var fighter = iMobile.fighters[i];
             if (!fighter.isDead) {
                 switch (fighter.fighterClass) {
                     case 'ORC':
                         if (allAttack) {
-                            action += 'A' + i + Constants.MOVE_ATTACK + ',E' + lastTarget;
+                            action += 'A' + fighter.orderNumberInTeam + ',' + Constants.MOVE_ATTACK + ',E' + lastTarget;
                         } else {
                             if (fighter.currentMana < 2) {
-                                action += 'A' + i + Constants.MOVE_ATTACK + ',E' + target;
+                                action += 'A' + fighter.orderNumberInTeam + ',' + Constants.MOVE_ATTACK + ',E' + target;
                             } else {
-                                action += 'A' + i + Constants.ORC.special + ',E' + target;
+                                action += 'A' + fighter.orderNumberInTeam + ',' + Constants.ORC.special + ',E' + target;
                             }
                         }
                         break;
                     case 'CHAMAN':
                         if (allAttack) {
-                            action += 'A' + i + Constants.MOVE_ATTACK + ',E' + lastTarget;
+                            action += 'A' + fighter.orderNumberInTeam + ',' + Constants.MOVE_ATTACK + ',E' + lastTarget;
                         } else {
                             if (fighter.currentMana < 2) {
-                                action += 'A' + i + Constants.MOVE_REST + ',E' + i;
+                                action += 'A' + fighter.orderNumberInTeam + ',' + Constants.MOVE_REST + ',E' + i;
                             } else {
                                 // si autre en feu, move special
                                 var playerInDanger = -1;
@@ -54,19 +57,19 @@ app.factory('ComputeMove', [function () {
                                     }
                                 }
                                 if (playerInDanger !== -1) {
-                                    action += 'A' + i + Constants.ORC.special + ',E' + playerInDanger;
+                                    action += 'A' + fighter.orderNumberInTeam + ',' + Constants.CHAMAN.special + ',E' + playerInDanger;
                                 } else {
-                                    action += 'A' + i + Constants.MOVE_ATTACK + ',E' + target;
+                                    action += 'A' + fighter.orderNumberInTeam + ',' + Constants.MOVE_ATTACK + ',E' + target;
                                 }
                             }
                         }
                         break;
                     case 'PRIEST':
                         if (allAttack) {
-                            action += 'A' + i + Constants.MOVE_ATTACK + ',E' + lastTarget;
+                            action += 'A' + fighter.orderNumberInTeam + ',' + Constants.MOVE_ATTACK + ',E' + lastTarget;
                         } else {
                             if (fighter.currentMana < 2) {
-                                action += 'A' + i + Constants.MOVE_REST + ',E' + i;
+                                action += 'A' + fighter.orderNumberInTeam + ',' + Constants.MOVE_REST + ',E' + i;
                             } else {
                                 // si autre a max pv -4, move special
                                 var playerInDanger = -1;
@@ -77,9 +80,9 @@ app.factory('ComputeMove', [function () {
                                     }
                                 }
                                 if (playerInDanger !== -1) {
-                                    action += 'A' + i + Constants.PRIEST.special + ',E' + playerInDanger;
+                                    action += 'A' + fighter.orderNumberInTeam + ',' + Constants.PRIEST.special + ',E' + playerInDanger;
                                 } else {
-                                    action += 'A' + i + Constants.MOVE_ATTACK + ',E' + target;
+                                    action += 'A' + fighter.orderNumberInTeam + ',' + Constants.MOVE_ATTACK + ',E' + target;
                                 }
                             }
                         }
@@ -93,6 +96,8 @@ app.factory('ComputeMove', [function () {
             allAttack = true;
             lastTarget = target;
         }
+
+        return action;
     }
 
     return {
