@@ -149,6 +149,25 @@ app.controller('MainCtrl', [
             return dangerousSituation;
         }
 
+        function getTarget (foeFightersObj, foeFighters) {
+            var priest = foeFighters['PRIEST'];
+            var guard = foeFighters['GUARD'];
+
+            if (priest && !priest.isDead) {
+                return priest.orderNumberInTeam;
+            } else if (guard && !guard.isDead) {
+                return guard.orderNumberInTeam;
+            } else {
+                for (var i = 0; i < foeFightersObj.length; i++) {
+                    var foe = foeFightersObj[i];
+                    if (!foe.isDead) {
+                        return foe.orderNumberInTeam;
+                    }
+                }
+            }
+            
+        }
+
         /**
          * analyse game board and last opponent's move
          * @return move to make
@@ -164,15 +183,10 @@ app.controller('MainCtrl', [
             var target;
 
             var foeFightersObj = foe.fighters;
-            for (var i = 0; i < foeFightersObj.length; i++) {
-                var possibleTarget = foeFightersObj[i];
-                if (possibleTarget.fighterClass === 'PRIEST') {
-                    target = possibleTarget.orderNumberInTeam;
-                    break;
-                } else if (!possibleTarget.isDead) {
-                    target = possibleTarget.orderNumberInTeam;
-                }
-            }
+            var foeFighters = _.mapKeys(foeFightersObj, function(fighter) {
+                return fighter.fighterClass;
+            });
+            target = getTarget(foeFightersObj, foeFighters);
 
             var PRIEST = fighters['PRIEST'];
             var CHAMAN = fighters['CHAMAN'];
