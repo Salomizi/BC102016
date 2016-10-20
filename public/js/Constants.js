@@ -22,26 +22,32 @@ app.factory('Constants', [function() {
         //HEROES
         HERO_ARCHER: {
             name: 'ARCHER',
+            pv: 20,
             special: 'FIREBOLT'
         },
         HERO_CHAMAN: {
             name:  'CHAMAN',
+            pv: 20,
             special: 'CLEANSE'
         },
         HERO_GUARD: {
             name:  'GUARD',
+            pv: 30,
             special: 'PROTECT'
         },
         HERO_ORC: {
             name:  'ORC',
+            pv: 30,
             special: 'YELL'
         },
         HERO_PALADIN: {
             name:  'PALADIN',
+            pv: 30,
             special: 'CHARGE'
         },
         HERO_PRIEST: {
             name:  'PRIEST',
+            pv: 20,
             special: 'HEAL'
         },
 
