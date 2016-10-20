@@ -11,6 +11,7 @@ app.factory('Constants', [function() {
         STATUS_NO: 'CANTPLAY',
         STATUS_WIN: 'VICTORY',
         STATUS_LOST: 'DEFEAT',
+        STATUS_DRAW: 'DRAW',
         STATUS_CANCEL: 'CANCELLED',
 
         MOVE_OK: 'OK',

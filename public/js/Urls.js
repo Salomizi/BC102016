@@ -1,12 +1,12 @@
 app.factory('Urls', [function() {
 
     ///////INFO AT http://codeandplay.date/public/api.html /////////////////////////
-    var BASE_URL = 'http://www.codeandplay.date';
-    var DUEL_URL = '/battle-ws/duel';
+    var BASE_URL = 'http://evenement.codeandplay.date/';
+    var DUEL_URL = '/epic-ws/epic';
 
     return {
         PING: BASE_URL + DUEL_URL + '/ping',
-        USER: BASE_URL + DUEL_URL + '/player/getIdEquipe/iMOBILE/_iMin1tel!?%',
+        USER: BASE_URL + DUEL_URL + '/player/getIdEquipe/iMOBILE/_iMin1tel',
 
         //vs player
         INIT_PLAYER_GAME: BASE_URL + DUEL_URL + '/versus/next/@teamId',

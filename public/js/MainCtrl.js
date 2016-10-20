@@ -12,6 +12,13 @@ app.controller('MainCtrl', [
         var gameLastMove = Urls.GAME_LAST_MOVE;
         var makeMoveUrl = Urls.GAME_MAKE_MOVE;
 
+        var gameUrl;
+        
+        //max persos choisis
+        var maxCharactersChosen = 3;
+        var numberCharactersChosen = 0;
+
+
         //GAME variables
         $scope.teamId = null;
         $scope.gameId = null;
@@ -253,73 +260,65 @@ app.controller('MainCtrl', [
                     $scope.display.push('[BOARD] state ' + board);
                     // parse the data to JSON                
                     board = JSON.parse(board);
-                    // should we compute the players names
-                    if (iMobile.length === 0) {
-                        if (board.player1.name === 'iMOBILE') {
-                            iMOBILE = 'player1';
-                            foe = 'player2';
-                        } else {
-                            iMobile = 'player2';
-                            foe = 'player1';
+
+                    //choose characters
+                    if (board.nbrTurnsLeft > 50) {
+                        chooseCharacter();
+                    } else {
+                        // should we compute the players names
+                        if (iMobile.length === 0) {
+                            if (board.player1.name === 'iMOBILE') {
+                                iMOBILE = 'player1';
+                                foe = 'player2';
+                            } else {
+                                iMobile = 'player2';
+                                foe = 'player1';
+                            }
                         }
-                    }
-                    // we store the current turn number
-                    currentTurn = board.nbrActionLeft;
-                    // get game status
-                    sendRequest(gameStatusUrl).then(function(status) {
-                        // game is running
-                        if (status !== null && status) {
-                            // can we play
-                            if (computeGameStatus(status)) {
-                                // retrieve the last foe's move
-                                sendRequest(gameLastMove).then(function(lastMove) {
-                                    $scope.display.push('[GAME] ' + board.player2.name + ' -- lastMove ' + lastMove);
-                                    enemyPlayedMoves[board.nbrActionLeft] = lastMove;
-                                    // compute our next move
-                                    var nextMove = computeNextMove(board, lastMove);
-                                    $scope.display.push('[GAME] ' + board.player1.name + ' -- nextMove ' + nextMove);
-                                    var newMoveUrl = angular.copy(makeMoveUrl).replace('@move', nextMove);
-                                    sendRequest(newMoveUrl).then(function(result) {
-                                        // can we continue
-                                        var canContinue = continueGame(result);
-                                        if (canContinue) {
-                                            play();
-                                        }
+                        // we store the current turn number
+                        currentTurn = board.nbrActionLeft;
+                        // get game status
+                        sendRequest(gameStatusUrl).then(function(status) {
+                            // game is running
+                            if (status !== null && status) {
+                                // can we play
+                                if (computeGameStatus(status)) {
+                                    // retrieve the last foe's move
+                                    sendRequest(gameLastMove).then(function(lastMove) {
+                                        $scope.display.push('[GAME] ' + board.player2.name + ' -- lastMove ' + lastMove);
+                                        enemyPlayedMoves[board.nbrActionLeft] = lastMove;
+                                        // compute our next move
+                                        var nextMove = computeNextMove(board, lastMove);
+                                        $scope.display.push('[GAME] ' + board.player1.name + ' -- nextMove ' + nextMove);
+                                        var newMoveUrl = angular.copy(makeMoveUrl).replace('@move', nextMove);
+                                        sendRequest(newMoveUrl).then(function(result) {
+                                            // can we continue
+                                            var canContinue = continueGame(result);
+                                            if (canContinue) {
+                                                play();
+                                            }
+                                        });
                                     });
-                                });
+                                } else {
+                                    gameOver = true;
+                                    $scope.gameId = null;
+                                }
+                            // game is over
                             } else {
                                 gameOver = true;
                                 $scope.gameId = null;
                             }
-                        // game is over
-                        } else {
-                            gameOver = true;
-                            $scope.gameId = null;
-                        }
-                    });
+                        });
+                    }
                 });
             }
         }
 
-
         /**
-         * retrieve teamId
+         * create new game
          */
-        $scope.getTeamId = function () {
-            if (!$scope.teamId) {
-                sendRequest(teamIdUrl).then(function(response) {
-                    $scope.display.push(response);
-                    $scope.teamId = response;
-                }, logError);
-            }
-        };
-        $scope.getTeamId();
-
-        /**
-         * create new bot game
-         */
-        function createGame(url) {
-            sendRequest(url).then(function(response) {
+        function createGame() {
+            sendRequest(gameUrl).then(function(response) {
                 $scope.display.push(response)
 
                 if (response !== Constants.UNKNOWN) {
@@ -336,14 +335,28 @@ app.controller('MainCtrl', [
                     $timeout($scope.createGame(), 300);
                 }
             }, logError);
+        }
+
+        /**
+         * retrieve teamId
+         */
+        $scope.getTeamId = function () {
+            if (!$scope.teamId) {
+                sendRequest(teamIdUrl).then(function(response) {
+                    $scope.display.push(response);
+                    $scope.teamId = response;
+                }, logError);
+            }
         };
+        $scope.getTeamId();
 
         /**
          * creates a bot game
          */
         $scope.createBotGame = function() {
             if ($scope.teamId && $scope.botLevel) {
-                createGame(createBotGameUrl.replace('@level', $scope.botLevel).replace('@teamId', $scope.teamId));
+                gameUrl = createBotGameUrl.replace('@level', $scope.botLevel).replace('@teamId', $scope.teamId);
+                createGame();
             }
         };
 
@@ -352,7 +365,8 @@ app.controller('MainCtrl', [
          */
         $scope.createVersusGame = function() {
             if ($scope.teamId) {
-                createGame(createVersusGameUrl.replace('@teamId', $scope.teamId));
+                gameUrl = createVersusGameUrl.replace('@teamId', $scope.teamId);
+                createGame();
             }
         };
 
