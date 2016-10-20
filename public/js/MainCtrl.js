@@ -15,7 +15,7 @@ app.controller('MainCtrl', [
         var gameUrl;
         
         var noPerso = 0;
-        var team = ['ORC','SHAMAN','PRETRE'];
+        var team = ['ORC','CHAMAN','PRIEST'];
         //max persos choisis
         var maxCharactersChosen = 3;
         var numberCharactersChosen = 0;
@@ -227,7 +227,7 @@ app.controller('MainCtrl', [
         function chooseCharacter(board){
            // if(board.getlastmove()){ 
             noPerso++;           
-            return team[noPerso-1];                              
+            return angular.copy(makeMoveUrl).replace('@move', team[noPerso-1]);                              
         }
 
 
@@ -245,7 +245,13 @@ app.controller('MainCtrl', [
 
                     //choose characters
                     if (board.nbrTurnsLeft > 50) {                         
-                        sendRequest(chooseCharacter(board));                     
+                        sendRequest(chooseCharacter(board)).then(function(result) {
+                            // can we continue
+                            var canContinue = continueGame(result);
+                            if (canContinue) {
+                                play();
+                            }
+                        });                     
                     } else {
                         // should we compute the players names
                         if (board.playerBoards[0].playerName === 'iMOBILE') {
@@ -256,7 +262,7 @@ app.controller('MainCtrl', [
                             foe = board.playerBoards[0];
                         }
                         // we store the current turn number
-                        currentTurn = board.nbrActionLeft;
+                        currentTurn = board.nbrTurnsLeft;
                         // get game status
                         sendRequest(gameStatusUrl).then(function(status) {
                             // game is running
@@ -265,11 +271,11 @@ app.controller('MainCtrl', [
                                 if (computeGameStatus(status)) {
                                     // retrieve the last foe's move
                                     sendRequest(gameLastMove).then(function(lastMove) {
-                                        $scope.display.push('[GAME] ' + board.player2.name + ' -- lastMove ' + lastMove);
-                                        enemyPlayedMoves[board.nbrActionLeft] = lastMove;
+                                        $scope.display.push('[GAME] ' + foe.playerName + ' -- lastMove ' + lastMove);
+                                        enemyPlayedMoves[board.nbrTurnsLeft] = lastMove;
                                         // compute our next move
                                         var nextMove = computeNextMove(board, lastMove);
-                                        $scope.display.push('[GAME] ' + board.player1.name + ' -- nextMove ' + nextMove);
+                                        $scope.display.push('[GAME] ' + iMOBILE.playerName + ' -- nextMove ' + nextMove);
                                         var newMoveUrl = angular.copy(makeMoveUrl).replace('@move', nextMove);
                                         sendRequest(newMoveUrl).then(function(result) {
                                             // can we continue
