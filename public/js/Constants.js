@@ -20,8 +20,8 @@ app.factory('Constants', [function() {
         MOVE_NOT_YOUR_TURN: 'NOTYET',
 
         //MOVES
-        MOVE_SHOOT: 'SHOOT',
-        MOVE_RELOAD: 'RELOAD',
+        MOVE_ATTACK: 'ATTACK',
+        MOVE_CHARGE: 'CHARGE',
         MOVE_COVER: 'COVER',
         MOVE_AIM: 'AIM',
         MOVE_BOMB: 'BOMB',

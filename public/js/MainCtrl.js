@@ -152,8 +152,8 @@ app.controller('MainCtrl', [
          * @return move to make
          */
         function computeNextMove (board, foeLastMove) {
-            var iMobile = board[iMOBILE];
-            var them = board[foe];
+            var iMobile = iMOBILE;
+            var them = foe;
             var randomChoice;
 
             if (aimed) {
@@ -266,14 +266,12 @@ app.controller('MainCtrl', [
                         chooseCharacter();
                     } else {
                         // should we compute the players names
-                        if (iMobile.length === 0) {
-                            if (board.player1.name === 'iMOBILE') {
-                                iMOBILE = 'player1';
-                                foe = 'player2';
-                            } else {
-                                iMobile = 'player2';
-                                foe = 'player1';
-                            }
+                        if (board.playerBoards[0].playerName === 'iMOBILE') {
+                            iMOBILE = board.playerBoards[0];
+                            foe = board.playerBoards[1];
+                        } else {
+                            iMOBILE = board.playerBoards[1];
+                            foe = board.playerBoards[0];
                         }
                         // we store the current turn number
                         currentTurn = board.nbrActionLeft;
