@@ -168,6 +168,7 @@ app.controller('MainCtrl', [
                 var possibleTarget = foeFightersObj[i];
                 if (!possibleTarget.isDead) {
                     target = possibleTarget.orderNumberInTeam;
+                    break;
                 }
             }
 
@@ -239,7 +240,7 @@ app.controller('MainCtrl', [
             if (!gameOver) {
                 sendRequest(gameBoardUrl).then(function(board) {
                     // display the board data
-                    $scope.display.push('[BOARD] state ' + board);
+                    //$scope.display.push('[BOARD] state ' + board);
                     // parse the data to JSON                
                     board = JSON.parse(board);
 
