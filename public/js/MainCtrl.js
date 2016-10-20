@@ -273,8 +273,8 @@ app.controller('MainCtrl', [
                     board = JSON.parse(board);
 
                     //choose characters
-                    if (board.nbrTurnsLeft > 50) {
-                        chooseCharacter(board);                        
+                    if (board.nbrTurnsLeft > 50) {                         
+                        sendRequest(chooseCharacter(board));                     
                     } else {
                         // should we compute the players names
                         if (board.playerBoards[0].playerName === 'iMOBILE') {
