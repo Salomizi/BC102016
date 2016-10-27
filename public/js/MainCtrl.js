@@ -263,7 +263,7 @@ app.controller('MainCtrl', [
                     // get game status
                     sendRequest(gameStatusUrl).then(function(status) {
                         // game is running
-                        if (status !== null && status) {
+                        if (status !== null) {
                             // can we play
                             switch (status) {
                                 case Constants.STATUS_YES:
@@ -310,8 +310,11 @@ app.controller('MainCtrl', [
                                     play();
                                     break;
                                 default:
+                                    $scope.display.push(status);
                                     break;
                             }
+                        } else {
+                            $scope.display.push('OHOH');
                         }
                     });                    
                 });

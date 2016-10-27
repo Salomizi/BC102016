@@ -24,11 +24,12 @@ app.factory('ComputeMove', ['Constants', function (Constants) {
         }
 
         for (var i = 0; i < 3; i++) {
-            if (action.length !== 0) {
-                action += '$';
-            }
             var fighter = iMobile.fighters[i];
             if (!fighter.isDead) {
+                if (action.length !== 0) {
+                    action += '$';
+                }
+
                 switch (fighter.fighterClass) {
                     case 'ORC':
                         if (allAttack) {
@@ -46,18 +47,18 @@ app.factory('ComputeMove', ['Constants', function (Constants) {
                             action += 'A' + fighter.orderNumberInTeam + ',' + Constants.MOVE_ATTACK + ',E' + lastTarget;
                         } else {
                             if (fighter.currentMana < 2) {
-                                action += 'A' + fighter.orderNumberInTeam + ',' + Constants.MOVE_REST + ',E' + i;
+                                action += 'A' + fighter.orderNumberInTeam + ',' + Constants.MOVE_REST + ',A' + fighter.orderNumberInTeam;
                             } else {
                                 // si autre en feu, move special
                                 var playerInDanger = -1;
                                 for (var j = 0; j < 3; j++) {
-                                    if (iMobile.fighters[j].states !== null) {
-                                        playerInDanger = j;
+                                    if (!iMobile.fighters[j].isDead && iMobile.fighters[j].states !== null) {
+                                        playerInDanger = j + 1;
                                         break;
                                     }
                                 }
                                 if (playerInDanger !== -1) {
-                                    action += 'A' + fighter.orderNumberInTeam + ',' + Constants.CHAMAN.special + ',E' + playerInDanger;
+                                    action += 'A' + fighter.orderNumberInTeam + ',' + Constants.CHAMAN.special + ',A' + playerInDanger;
                                 } else {
                                     action += 'A' + fighter.orderNumberInTeam + ',' + Constants.MOVE_ATTACK + ',E' + target;
                                 }
@@ -69,18 +70,18 @@ app.factory('ComputeMove', ['Constants', function (Constants) {
                             action += 'A' + fighter.orderNumberInTeam + ',' + Constants.MOVE_ATTACK + ',E' + lastTarget;
                         } else {
                             if (fighter.currentMana < 2) {
-                                action += 'A' + fighter.orderNumberInTeam + ',' + Constants.MOVE_REST + ',E' + i;
+                                action += 'A' + fighter.orderNumberInTeam + ',' + Constants.MOVE_REST + ',A' + fighter.orderNumberInTeam;
                             } else {
                                 // si autre a max pv -4, move special
                                 var playerInDanger = -1;
                                 for (var j = 0; j < 3; j++) {
-                                    if (iMobile.fighters[j].currentLife < Constants[iMobile.fighters[j].fighterClass].pv - HEAL_LIMIT) {
-                                        playerInDanger = j;
+                                    if (!iMobile.fighters[j].isDead && iMobile.fighters[j].currentLife < Constants[iMobile.fighters[j].fighterClass].pv - HEAL_LIMIT) {
+                                        playerInDanger = j + 1;
                                         break;
                                     }
                                 }
                                 if (playerInDanger !== -1) {
-                                    action += 'A' + fighter.orderNumberInTeam + ',' + Constants.PRIEST.special + ',E' + playerInDanger;
+                                    action += 'A' + fighter.orderNumberInTeam + ',' + Constants.PRIEST.special + ',A' + playerInDanger;
                                 } else {
                                     action += 'A' + fighter.orderNumberInTeam + ',' + Constants.MOVE_ATTACK + ',E' + target;
                                 }
@@ -92,7 +93,7 @@ app.factory('ComputeMove', ['Constants', function (Constants) {
         }
 
         allAttack = false;
-        if (action.indexOf(Constants.ORC.special)) {
+        if (action.indexOf(Constants.ORC.special) !== - 1) {
             allAttack = true;
             lastTarget = target;
         }
